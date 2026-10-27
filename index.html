@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookShelf - ร้านขายหนังสือออนไลน์</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        emerald: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                        }
+                    },
+                    fontFamily: {
+                        prompt: ['Prompt', 'sans-serif'],
+                        sarabun: ['Sarabun', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Sarabun', sans-serif; }
+        h1, h2, h3, h4, h5, h6, .font-heading { font-family: 'Prompt', sans-serif; }
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 flex flex-col min-h-screen">
+
+    <!-- Header / Navbar -->
+    <header class="sticky top-0 z-40 bg-white shadow-sm border-b border-slate-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logo -->
+                <a href="#" class="flex items-center gap-3 group">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-xl shadow-md group-hover:bg-emerald-700 transition">
+                        <i class="fa-solid font-heading fa-book-open"></i>
+                    </div>
+                    <div>
+                        <span class="text-xl font-bold font-heading text-slate-800 tracking-tight block leading-none">Book<span class="text-emerald-600">Shelf</span></span>
+                        <span class="text-[10px] text-slate-400 font-medium">ร้านหนังสือออนไลน์</span>
+                    </div>
+                </a>
+
+                <!-- Search Bar -->
+                <div class="hidden md:flex flex-1 max-w-md mx-8 relative">
+                    <input type="text" id="searchInput" onkeyup="filterBooks()" placeholder="ค้นหาชื่อหนังสือ, ผู้เขียน, หรือหมวดหมู่..." 
+                        class="w-full bg-slate-100 border border-transparent rounded-full py-2.5 pl-11 pr-4 text-sm focus:bg-white focus:border-emerald-600 focus:outline-none transition">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-400"></i>
+                </div>
+
+                <!-- Right Actions -->
+                <div class="flex items-center gap-3">
+                    <button onclick="openAuthModal()" class="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 hover:text-emerald-600 rounded-lg hover:bg-slate-50 transition">
+                        <i class="fa-regular fa-user text-base"></i>
+                        <span>เข้าสู่ระบบ</span>
+                    </button>
+
+                    <!-- Cart Button -->
+                    <button onclick="toggleCartModal(true)" class="relative p-2.5 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-xl transition flex items-center gap-2">
+                        <i class="fa-solid fa-cart-shopping text-lg"></i>
+                        <span class="hidden sm:inline text-sm font-semibold font-heading">ตะกร้า</span>
+                        <span id="cartCount" class="absolute -top-1.5 -right-1.5 bg-rose-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center shadow">0</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile Search -->
+            <div class="pb-4 md:hidden">
+                <div class="relative">
+                    <input type="text" id="mobileSearchInput" onkeyup="syncMobileSearch(this.value)" placeholder="ค้นหาชื่อหนังสือ, ผู้เขียน..." 
+                        class="w-full bg-slate-100 border border-transparent rounded-full py-2 pl-10 pr-4 text-sm focus:bg-white focus:border-emerald-600 focus:outline-none">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow">
+        <!-- Hero Banner -->
+        <section class="bg-gradient-to-r from-emerald-900 via-emerald-800 to-teal-900 text-white py-12 md:py-16 relative overflow-hidden">
+            <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <span class="inline-block px-3 py-1 bg-emerald-700/60 backdrop-blur border border-emerald-500/30 text-emerald-200 text-xs font-semibold rounded-full mb-4">
+                            ✨ ต้อนรับเปิดเทอมใหม่ ลดสูงสุด 30%
+                        </span>
+                        <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold font-heading leading-tight mb-4">
+                            เปิดโลกแห่งความรู้ <br>ผ่านตัวอักษรที่คุณรัก
+                        </h1>
+                        <p class="text-slate-300 text-sm sm:text-base mb-6 font-light">
+                            รวบรวมหนังสือคุณภาพมากกว่า 10,000 เล่ม ทั้งแนวพัฒนาตนเอง บริหาร วรรณกรรม และการ์ตูน พร้อมจัดส่งถึงบ้านคุณ
+                        </p>
+                        <div class="flex flex-wrap gap-3">
+                            <a href="#book-section" class="px-6 py-3 bg-white text-emerald-900 font-bold font-heading text-sm rounded-xl hover:bg-emerald-50 shadow-lg transition transform active:scale-95">
+                                ช้อปเลยตอนนี้
+                            </a>
+                            <a href="#book-section" onclick="setCategory('พัฒนาตนเอง')" class="px-6 py-3 bg-emerald-800/80 border border-emerald-600 text-white font-medium text-sm rounded-xl hover:bg-emerald-700 transition">
+                                หนังสือขายดี
+                            </a>
+                        </div>
+                    </div>
+                    <div class="hidden md:flex justify-end gap-4">
+                        <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80" class="w-44 h-64 object-cover rounded-xl shadow-2xl transform -rotate-3 hover:rotate-0 transition duration-300" alt="Book 1">
+                        <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=400&q=80" class="w-44 h-64 object-cover rounded-xl shadow-2xl transform rotate-3 translate-y-6 hover:rotate-0 transition duration-300" alt="Book 2">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Books Section -->
+        <section id="book-section" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <!-- Filter Categories & Sort -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                <!-- Categories -->
+                <div class="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 no-scrollbar">
+                    <button onclick="setCategory('ทั้งหมด')" class="cat-btn bg-emerald-600 text-white px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition">ทั้งหมด</button>
+                    <button onclick="setCategory('พัฒนาตนเอง')" class="cat-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition">พัฒนาตนเอง</button>
+                    <button onclick="setCategory('บริหาร/ธุรกิจ')" class="cat-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition">บริหาร/ธุรกิจ</button>
+                    <button onclick="setCategory('นิยาย/วรรณกรรม')" class="cat-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition">นิยาย/วรรณกรรม</button>
+                    <button onclick="setCategory('เทคโนโลยี')" class="cat-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition">เทคโนโลยี</button>
+                </div>
+
+                <!-- Sort -->
+                <div class="flex items-center gap-2 self-end md:self-auto">
+                    <span class="text-xs text-slate-500 font-medium">เรียงตาม:</span>
+                    <select id="sortSelect" onchange="filterBooks()" class="bg-white border border-slate-200 text-slate-700 text-sm rounded-xl px-3 py-2 focus:outline-none focus:border-emerald-600">
+                        <option value="popular">ยอดนิยม</option>
+                        <option value="price-asc">ราคา: ต่ำสุด -> สูงสุด</option>
+                        <option value="price-desc">ราคา: สูงสุด -> ต่ำสุด</option>
+                        <option value="rating">คะแนนรีวิว</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Book Grid -->
+            <div id="bookGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
+                <!-- Books rendered dynamically -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="hidden text-center py-16">
+                <i class="fa-solid fa-book-open text-5xl text-slate-300 mb-4"></i>
+                <h3 class="text-lg font-bold font-heading text-slate-700">ไม่พบหนังสือที่คุณค้นหา</h3>
+                <p class="text-slate-500 text-sm mt-1">ลองค้นหาด้วยคำอื่น หรือเลือกหมวดใหม่อีกครั้ง</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-10 mt-12 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="space-y-3">
+                <div class="flex items-center gap-2 text-white font-bold font-heading text-xl">
+                    <i class="fa-solid fa-book-open text-emerald-500"></i> BookShelf
+                </div>
+                <p class="text-sm">ร้านหนังสือออนไลน์ชั้นนำ รวบรวมหนังสือคุณภาพหลากหมวดหมู่ ส่งตรงถึงบ้านคุณด้วยความรวดเร็ว</p>
+            </div>
+            <div>
+                <h4 class="text-white font-semibold font-heading mb-3 text-sm">บริการลูกค้า</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="#" class="hover:text-emerald-400">วิธีสั่งซื้อสินค้า</a></li>
+                    <li><a href="#" class="hover:text-emerald-400">การจัดส่งสินค้า</a></li>
+                    <li><a href="#" class="hover:text-emerald-400">การคืนเงินและคืนสินค้า</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-semibold font-heading mb-3 text-sm">หมวดหมู่ยอดนิยม</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="#" class="hover:text-emerald-400">จิตวิทยา & พัฒนาตนเอง</a></li>
+                    <li><a href="#" class="hover:text-emerald-400">การเงิน & การลงทุน</a></li>
+                    <li><a href="#" class="hover:text-emerald-400">คอมพิวเตอร์ & AI</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-semibold font-heading mb-3 text-sm">ติดตามเรา</h4>
+                <div class="flex gap-3 text-lg">
+                    <a href="#" class="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#" class="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition"><i class="fa-brands fa-line"></i></a>
+                    <a href="#" class="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition"><i class="fa-brands fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 pt-6 border-t border-slate-800 text-xs text-center">
+            &copy; 2026 BookShelf Store. All rights reserved.
+        </div>
+    </footer>
+
+    <!-- Cart Drawer Modal -->
+    <div id="cartModal" class="fixed inset-0 z-50 overflow-hidden hidden">
+        <div onclick="toggleCartModal(false)" class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity"></div>
+        <div class="fixed inset-y-0 right-0 max-w-full flex pl-10">
+            <div class="w-screen max-w-md bg-white shadow-2xl flex flex-col">
+                <div class="p-4 sm:p-6 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-cart-shopping text-emerald-600 text-lg"></i>
+                        <h2 class="text-lg font-bold font-heading text-slate-800">ตะกร้าสินค้าของคุณ</h2>
+                    </div>
+                    <button onclick="toggleCartModal(false)" class="text-slate-400 hover:text-slate-600 p-2">
+                        <i class="fa-solid fa-xmark text-xl"></i>
+                    </button>
+                </div>
+
+                <!-- Cart Items List -->
+                <div id="cartList" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+                    <!-- Dynamic Items -->
+                </div>
+
+                <!-- Cart Footer -->
+                <div class="p-4 sm:p-6 bg-slate-50 border-t border-slate-100 space-y-4">
+                    <div class="flex justify-between text-base font-bold font-heading text-slate-800">
+                        <span>ราคารวมทั้งหมด</span>
+                        <span id="cartTotal" class="text-emerald-600">฿0</span>
+                    </div>
+                    <button onclick="checkout()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold font-heading py-3 rounded-xl transition shadow-md active:scale-95">
+                        ชำระเงิน
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Book Detail Modal -->
+    <div id="detailModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div onclick="closeDetailModal()" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative z-10 shadow-2xl p-6 sm:p-8">
+            <button onclick="closeDetailModal()" class="absolute top-4 right-4 w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-full flex items-center justify-center text-slate-500">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div id="detailContent" class="grid sm:grid-cols-2 gap-6">
+                <!-- Content inserted via JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="authModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div onclick="closeAuthModal()" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+        <div class="bg-white rounded-2xl max-w-sm w-full relative z-10 shadow-2xl p-6">
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <h3 class="text-xl font-bold font-heading text-slate-800 mb-1">เข้าสู่ระบบ</h3>
+            <p class="text-xs text-slate-500 mb-4">ยินดีต้อนรับกลับเข้าสู่ BookShelf</p>
+            <form onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">อีเมล</label>
+                    <input type="email" required placeholder="example@email.com" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">รหัสผ่าน</label>
+                    <input type="password" required placeholder="••••••••" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none">
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold font-heading py-2.5 rounded-xl transition text-sm">
+                    เข้าสู่ระบบ
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 bg-slate-800 text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 transform translate-y-20 opacity-0 transition-all duration-300">
+        <i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+        <span id="toastMessage" class="text-sm font-medium">เพิ่มสินค้าลงตะกร้าเรียบร้อย</span>
+    </div>
+
+    <!-- JavaScript logic -->
+    <script>
+        const books = [
+            { id: 1, title: 'Atomic Habits เพราะหยดน้ำกลายเป็นมหาสมุทร', author: 'James Clear', price: 285, rating: 4.9, category: 'พัฒนาตนเอง', cover: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80', description: 'การเปลี่ยนแปลงเล็กๆ ที่สร้างผลลัพธ์อันยิ่งใหญ่ เรียนรู้วิธีการสร้างนิสัยที่ดีและขจัดนิสัยที่ไม่ดีออกไปอย่างยั่งยืน' },
+            { id: 2, title: 'Psychology of Money จิตวิทยาว่าด้วยเงิน', author: 'Morgan Housel', price: 290, rating: 4.8, category: 'บริหาร/ธุรกิจ', cover: 'https://images.unsplash.com/photo-1592496431122-2349e0fbc666?auto=format&fit=crop&w=400&q=80', description: 'บทเรียนที่ไร้กาลเวลาเรื่องความโลภ ความมั่งคั่ง และความสุข เพื่อให้คุณเข้าใจพฤติกรรมทางการเงินของมนุษย์' },
+            { id: 3, title: 'กล้าที่จะถูกเกลียด', author: 'Kishimi Ichiro', price: 240, rating: 4.7, category: 'พัฒนาตนเอง', cover: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=400&q=80', description: 'ปลดล็อกชีวิตด้วยคำสอนจากปรัชญาอัลเฟรด แอดเลอร์ เลิกแคร์สายตาคนอื่นและใช้ชีวิตในแบบที่เป็นตัวเอง' },
+            { id: 4, title: 'Clean Code: A Handbook of Agile Software Craftsmanship', author: 'Robert C. Martin', price: 650, rating: 4.9, category: 'เทคโนโลยี', cover: 'https://images.unsplash.com/photo-1532012197267-da84d127e765?auto=format&fit=crop&w=400&q=80', description: 'คู่มือสำหรับโปรแกรมเมอร์ที่ต้องการเขียนโค้ดให้อ่านง่าย มีระเบียบ และบำรุงรักษาได้ง่ายในระยะยาว' },
+            { id: 5, title: 'มหัศจรรย์ร้านขายยาของขวัญแห่งความทรงจำ', author: 'Son Won-pyung', price: 320, rating: 4.6, category: 'นิยาย/วรรณกรรม', cover: 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=400&q=80', description: 'วรรณกรรมฮีลใจจากเกาหลีใต้ เรื่องราวของความทรงจำและของขวัญที่เปลี่ยนชีวิตผู้คนในร้านขายยาปริศนา' },
+            { id: 6, title: 'Think Again คิดแล้ว, คิดอีก', author: 'Adam Grant', price: 350, rating: 4.8, category: 'บริหาร/ธุรกิจ', cover: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=400&q=80', description: 'พลังของการรู้วิธีที่ไม่รู้ การตั้งคำถามกับสิ่งที่เราคิดว่ารู้ดีอยู่แล้ว เพื่อเปิดมุมมองใหม่ในการทำงานและชีวิต' },
+            { id: 7, title: 'AI Era 2026: โลกยุคปัญญาประดิษฐ์เปลี่ยนอนาคต', author: 'ดร. สมชาย พัฒนกุล', price: 390, rating: 4.9, category: 'เทคโนโลยี', cover: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=400&q=80', description: 'เจาะลึกเทคโนโลยี AI และ Generative AI ที่กำลังดิสรัปต์ทุกอุตสาหกรรม พร้อมแนวทางปรับตัวให้รอดในอนาคต' },
+            { id: 8, title: 'เจ้าชายน้อย (The Little Prince)', author: 'Antoine de Saint-Exupéry', price: 185, rating: 5.0, category: 'นิยาย/วรรณกรรม', cover: 'https://images.unsplash.com/photo-1476275466078-4007374efbbe?auto=format&fit=crop&w=400&q=80', description: 'วรรณกรรมคลาสสิกระดับโลกที่จะทำให้คุณมองเห็นสิ่งสำคัญในชีวิตได้ด้วยหัวใจ ไม่ใช่ด้วยสายตา' }
+        ];
+
+        let cart = [];
+        let currentCategory = 'ทั้งหมด';
+
+        // Render Books Grid
+        function renderBooks(booksToRender) {
+            const grid = document.getElementById('bookGrid');
+            const emptyState = document.getElementById('emptyState');
+            
+            grid.innerHTML = '';
+            
+            if (booksToRender.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            booksToRender.forEach(book => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl transition duration-300 flex flex-col justify-between overflow-hidden group';
+                card.innerHTML = `
+                    <div>
+                        <div class="relative overflow-hidden aspect-[3/4] bg-slate-100 cursor-pointer" onclick="openDetailModal(${book.id})">
+                            <img src="${book.cover}" alt="${book.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <span class="absolute top-2 left-2 bg-emerald-600 text-white text-[10px] font-bold font-heading px-2 py-1 rounded-md shadow">
+                                ${book.category}
+                            </span>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex items-center gap-1 text-amber-400 text-xs mb-1">
+                                <i class="fa-solid fa-star"></i>
+                                <span class="font-bold text-slate-700 ml-1">${book.rating}</span>
+                            </div>
+                            <h3 class="font-bold font-heading text-slate-800 text-sm mb-1 line-clamp-2 hover:text-emerald-600 cursor-pointer" onclick="openDetailModal(${book.id})">
+                                ${book.title}
+                            </h3>
+                            <p class="text-xs text-slate-500 mb-2">${book.author}</p>
+                        </div>
+                    </div>
+                    <div class="p-4 pt-0 flex items-center justify-between">
+                        <span class="text-base font-bold font-heading text-emerald-600">฿${book.price}</span>
+                        <button onclick="addToCart(${book.id})" class="p-2.5 bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white rounded-xl transition shadow-sm active:scale-90">
+                            <i class="fa-solid fa-cart-plus"></i>
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Category Filter
+        function setCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                if (btn.innerText === cat) {
+                    btn.className = 'cat-btn bg-emerald-600 text-white px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition';
+                } else {
+                    btn.className = 'cat-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition';
+                }
+            });
+            filterBooks();
+        }
+
+        // Filter and Sort Books
+        function filterBooks() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const sort = document.getElementById('sortSelect').value;
+
+            let result = books.filter(b => {
+                const matchCategory = currentCategory === 'ทั้งหมด' || b.category === currentCategory;
+                const matchSearch = b.title.toLowerCase().includes(search) || b.author.toLowerCase().includes(search);
+                return matchCategory && matchSearch;
+            });
+
+            if (sort === 'price-asc') result.sort((a, b) => a.price - b.price);
+            if (sort === 'price-desc') result.sort((a, b) => b.price - a.price);
+            if (sort === 'rating') result.sort((a, b) => b.rating - a.rating);
+
+            renderBooks(result);
+        }
+
+        function syncMobileSearch(val) {
+            document.getElementById('searchInput').value = val;
+            filterBooks();
+        }
+
+        // Cart Functions
+        function addToCart(id) {
+            const book = books.find(b => b.id === id);
+            const item = cart.find(c => c.id === id);
+            if (item) {
+                item.qty++;
+            } else {
+                cart.push({ ...book, qty: 1 });
+            }
+            updateCartUI();
+            showToast(`เพิ่ม "${book.title}" ลงตะกร้าแล้ว`);
+        }
+
+        function updateQty(id, change) {
+            const item = cart.find(c => c.id === id);
+            if (item) {
+                item.qty += change;
+                if (item.qty <= 0) {
+                    cart = cart.filter(c => c.id !== id);
+                }
+            }
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const list = document.getElementById('cartList');
+            const total = document.getElementById('cartTotal');
+            const count = document.getElementById('cartCount');
+
+            list.innerHTML = '';
+            let sum = 0;
+            let totalItems = 0;
+
+            if (cart.length === 0) {
+                list.innerHTML = `
+                    <div class="text-center py-12 text-slate-400">
+                        <i class="fa-solid fa-basket-shopping text-4xl mb-3"></i>
+                        <p class="text-sm font-medium">ไม่มีสินค้าในตะกร้าของคุณ</p>
+                    </div>
+                `;
+            } else {
+                cart.forEach(item => {
+                    sum += item.price * item.qty;
+                    totalItems += item.qty;
+                    const el = document.createElement('div');
+                    el.className = 'flex items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100';
+                    el.innerHTML = `
+                        <img src="${item.cover}" class="w-14 h-18 object-cover rounded-lg">
+                        <div class="flex-1">
+                            <h4 class="text-xs font-bold font-heading text-slate-800 line-clamp-1">${item.title}</h4>
+                            <p class="text-xs text-emerald-600 font-bold mt-1">฿${item.price}</p>
+                            <div class="flex items-center gap-2 mt-2">
+                                <button onclick="updateQty(${item.id}, -1)" class="w-6 h-6 bg-white border rounded-md text-xs font-bold flex items-center justify-center hover:bg-slate-100">-</button>
+                                <span class="text-xs font-bold px-1">${item.qty}</span>
+                                <button onclick="updateQty(${item.id}, 1)" class="w-6 h-6 bg-white border rounded-md text-xs font-bold flex items-center justify-center hover:bg-slate-100">+</button>
+                            </div>
+                        </div>
+                        <button onclick="updateQty(${item.id}, -${item.qty})" class="text-slate-400 hover:text-rose-500 p-2">
+                            <i class="fa-regular fa-trash-can text-sm"></i>
+                        </button>
+                    `;
+                    list.appendChild(el);
+                });
+            }
+
+            total.innerText = `฿${sum.toLocaleString()}`;
+            count.innerText = totalItems;
+        }
+
+        function toggleCartModal(show) {
+            const modal = document.getElementById('cartModal');
+            if (show) modal.classList.remove('hidden');
+            else modal.classList.add('hidden');
+        }
+
+        // Book Detail Modal
+        function openDetailModal(id) {
+            const book = books.find(b => b.id === id);
+            const content = document.getElementById('detailContent');
+            content.innerHTML = `
+                <div class="aspect-[3/4] rounded-xl overflow-hidden bg-slate-100">
+                    <img src="${book.cover}" class="w-full h-full object-cover">
+                </div>
+                <div class="flex flex-col justify-between">
+                    <div>
+                        <span class="inline-block px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-md mb-2">${book.category}</span>
+                        <h2 class="text-xl font-bold font-heading text-slate-800 mb-1">${book.title}</h2>
+                        <p class="text-xs text-slate-500 mb-3">ผู้เขียน: ${book.author}</p>
+                        <div class="flex items-center gap-1 text-amber-400 text-sm mb-4">
+                            <i class="fa-solid fa-star"></i>
+                            <span class="font-bold text-slate-700 ml-1">${book.rating} / 5.0</span>
+                        </div>
+                        <p class="text-sm text-slate-600 font-light leading-relaxed mb-4">${book.description}</p>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold font-heading text-emerald-600 mb-4">฿${book.price}</div>
+                        <button onclick="addToCart(${book.id}); closeDetailModal();" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold font-heading py-3 rounded-xl shadow-md transition">
+                            <i class="fa-solid fa-cart-plus mr-2"></i> เพิ่มลงตะกร้า
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('detailModal').classList.remove('hidden');
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.add('hidden');
+        }
+
+        // Auth Modal
+        function openAuthModal() { document.getElementById('authModal').classList.remove('hidden'); }
+        function closeAuthModal() { document.getElementById('authModal').classList.add('hidden'); }
+        function handleLogin(e) {
+            e.preventDefault();
+            closeAuthModal();
+            showToast('เข้าสู่ระบบสำเร็จแล้ว!');
+        }
+
+        // Checkout Sim
+        function checkout() {
+            if (cart.length === 0) {
+                showToast('กรุณาเลือกสินค้าอย่างน้อย 1 ชิ้น');
+                return;
+            }
+            alert('ขอบคุณสำหรับการสั่งซื้อ! ระบบจำลองการสั่งซื้อเสร็จสมบูรณ์');
+            cart = [];
+            updateCartUI();
+            toggleCartModal(false);
+        }
+
+        // Toast Notification
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // Initial Render
+        renderBooks(books);
+    </script>
+</body>
+</html>
